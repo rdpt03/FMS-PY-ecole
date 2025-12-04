@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from daos.dao import Dao
 from models.address import Address
@@ -30,21 +30,19 @@ class TeacherDao(Dao[Teacher]):
         #open connection
         with Dao.connection.cursor() as cursor:
             #create command, execute and get
-            sql = ("SELECT * FROM teacher t"
-                    "INNER JOIN person p ON t.id_person = p.id_person;")
+            sql = ("SELECT id_teacher, first_name, last_name, age, hiring_date FROM teacher t INNER JOIN person p ON t.id_person = p.id_person;")
             cursor.execute(sql)
-            sql_student_list = cursor.fetchall()
+            sql_teacher_list = cursor.fetchall()
 
             #transform into oop
-            if sql_student_list:
+            if sql_teacher_list:
                 #for each
-                for student in sql_student_list:
+                for teacher in sql_teacher_list:
                     #create the oop
-                    oop_student = Teacher(student['first_name'], student['last_name'], student['age'])
-                    #add address
-                    oop_student.address = Address(student['street'], student['city'], student['postal_code'],)
+                    oop_teacher = Teacher(teacher['first_name'], teacher['last_name'], teacher['age'], teacher['hiring_date'])
+                    oop_teacher.id_teacher = teacher['id_teacher']
                     #add to list
-                    oop_object_list.append(oop_student)
+                    oop_object_list.append(oop_teacher)
         return oop_object_list
 
     def update(self, obj: Teacher) -> bool:
@@ -63,3 +61,15 @@ class TeacherDao(Dao[Teacher]):
         :return: True si la suppression a pu être réalisée
         """
         ...
+
+    def get_courses(self, teacher: Teacher):
+        """Renvoit le cours correspondant au professeur envoyé par parametre"""
+        courses_result: List
+
+        with Dao.connection.cursor() as cursor:
+            sql =   ("SELECT c.id_course FROM course c "
+                    "INNER JOIN takes t ON c.id_course = t.id_course "
+                    "WHERE t.student_nbr = %s")
+            cursor.execute(sql, (student.student_nbr,))
+            courses_result = cursor.fetchall()
+        return courses_result

@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import date
 
 from daos.course_dao import CourseDao
-from models.address import Address
+from daos.teacher_dao import TeacherDao
 from models.course import Course
 from models.teacher import Teacher
 from models.student import Student
@@ -61,18 +61,36 @@ class School:
         #load all daos
         student_dao = StudentDAO()
         course_dao = CourseDao()
+        teacher_dao = TeacherDao()
+
         #load student list
         self.students = student_dao.read_all()
         self.courses = course_dao.read_all()
+        self.teachers = teacher_dao.read_all()
 
+        #load courses of student
+        courses_by_id = {c.id: c for c in self.courses}
+
+        #for each sudent
+        for student in self.students:
+            #get his courses
+            his_courses_db = student_dao.get_courses(student)
+            #for each course
+            for course_db in his_courses_db:
+                #find by id with local courses
+                course_oop = courses_by_id.get(course_db['id_course'])
+                #add if found
+                if course_oop:
+                    student.add_course(course_oop)
+
+    #TEMPORARY
+    def parse_by_first_name(self, list, find):
+        return next((obj for obj in list if obj.first_name.lower() == find.lower()), None)
     def getit(self,list,find):
         return next((obj for obj in list if obj.name.lower() == find.lower()), None)
 
 
     def init_static(self) -> None:
-
-
-
         """Initialisation d'un jeu de test pour l'école."""
         
         # création des étudiants et rattachement à leur adresse
@@ -88,11 +106,8 @@ class School:
         # ajout de ceux-ci à l'école
         for student in [paul, valerie, louis]:
             self.add_student(student)
+        
         """
-        paul = next((obj for obj in self.students if obj.first_name.lower() == "paul"), None)
-        valerie = next((obj for obj in self.students if obj.first_name.lower() == "valérie"), None)
-        louis = next((obj for obj in self.students if obj.first_name.lower() == "louis"), None)
-
         # création des cours
         """
         francais: Course = Course("Français", date(2024, 1, 29),
@@ -111,9 +126,6 @@ class School:
                                             date(2024, 2, 24))
         sport: Course = Course("Sport", date(2024, 3, 4),
                                         date(2024, 3, 15))
-        
-        
-
         # ajout de ceux-ci à l'école
         for course in [francais, histoire, geographie, mathematiques,
                        physique, chimie, anglais, sport]:
@@ -130,6 +142,7 @@ class School:
         sport = self.getit(self.courses,"sport")
 
         # création des enseignants
+        """
         victor  = Teacher('Victor', 'Hugo', 23, date(2023, 9, 4))
         jules   = Teacher('Jules', 'Michelet', 32, date(2023, 9, 4))
         sophie  = Teacher('Sophie', 'Germain', 25, date(2023, 9, 4))
@@ -140,8 +153,17 @@ class School:
         # ajout de ceux-ci à l'école
         for teacher in [victor, jules, sophie, marie, william, michel]:
             self.add_teacher(teacher)
+        """
+        victor  = self.parse_by_first_name(self.teachers,'Victor')
+        jules   = self.parse_by_first_name(self.teachers,'Jules')
+        sophie  = self.parse_by_first_name(self.teachers,'Sophie')
+        marie   = self.parse_by_first_name(self.teachers,'Marie')
+        william = self.parse_by_first_name(self.teachers,'William')
+        michel  = self.parse_by_first_name(self.teachers,'Michel')
+
 
         # association des élèves aux cours qu'ils suivent
+        """
         for course in [geographie, physique, anglais]:
             paul.add_course(course)
 
@@ -150,7 +172,7 @@ class School:
 
         for course in [mathematiques, physique, geographie, sport]:
             louis.add_course(course)
-
+        """
         # association des enseignants aux cours qu'ils enseignent
         victor.add_course(francais)
 

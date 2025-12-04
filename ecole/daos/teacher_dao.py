@@ -40,7 +40,7 @@ class TeacherDao(Dao[Teacher]):
                 for teacher in sql_teacher_list:
                     #create the oop
                     oop_teacher = Teacher(teacher['first_name'], teacher['last_name'], teacher['age'], teacher['hiring_date'])
-                    oop_teacher.id_teacher = teacher['id_teacher']
+                    oop_teacher.id = teacher['id_teacher']
                     #add to list
                     oop_object_list.append(oop_teacher)
         return oop_object_list
@@ -67,9 +67,7 @@ class TeacherDao(Dao[Teacher]):
         courses_result: List
 
         with Dao.connection.cursor() as cursor:
-            sql =   ("SELECT c.id_course FROM course c "
-                    "INNER JOIN takes t ON c.id_course = t.id_course "
-                    "WHERE t.student_nbr = %s")
-            cursor.execute(sql, (student.student_nbr,))
+            sql =   "SELECT name FROM course c WHERE c.id_teacher = %s"
+            cursor.execute(sql, (teacher.id,))
             courses_result = cursor.fetchall()
         return courses_result

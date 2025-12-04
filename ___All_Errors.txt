@@ -1,0 +1,10 @@
+CorrelationId: 47ee2d16-f27b-4b4c-8010-c5058aac9e05
+UTC DateTime: 12/03/2025 12:22:45
+
+The following files/folders have not been downloaded
+0. ecole/business/__init__.py
+1. ecole/daos/__init__.py
+2. ecole/daos/address_dao.py
+3. ecole/daos/student_dao.py
+4. ecole/daos/teacher_dao.py
+5. ecole/models/__init__.py

@@ -99,13 +99,6 @@ class School:
                     teacher.add_course(course_oop)
 
 
-    #TEMPORARY
-    def parse_by_first_name(self, list, find):
-        return next((obj for obj in list if obj.first_name.lower() == find.lower()), None)
-    def getit(self,list,find):
-        return next((obj for obj in list if obj.name.lower() == find.lower()), None)
-
-
     def init_static(self) -> None:
         """Initialisation d'un jeu de test pour l'école."""
         

@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 from daos.dao import Dao
 from models.address import Address
+from models.course import Course
 from models.student import Student
 
 
@@ -30,7 +31,7 @@ class StudentDAO(Dao[Student]):
         #open connection
         with Dao.connection.cursor() as cursor:
             #create command, execute and get
-            sql = ("SELECT first_name, last_name,age,street,city,postal_code FROM student s "
+            sql = ("SELECT student_nbr, first_name, last_name,age,street,city,postal_code FROM student s "
                    " INNER JOIN person p ON s.id_person = p.id_person"
                    " INNER JOIN address a ON p.id_address = a.id_address;")
             cursor.execute(sql)
@@ -42,6 +43,8 @@ class StudentDAO(Dao[Student]):
                 for student in sql_student_list:
                     #create the oop
                     oop_student = Student(student['first_name'], student['last_name'], student['age'])
+                    #set ids
+                    oop_student.students_nbr = student['student_nbr']
                     #add address
                     oop_student.address = Address(student['street'], student['city'], student['postal_code'],)
                     #add to list
@@ -64,3 +67,16 @@ class StudentDAO(Dao[Student]):
         :return: True si la suppression a pu être réalisée
         """
         ...
+
+
+    def get_courses(self, student: Student):
+        """Renvoit le cours correspondant à l'etudiant envoyé par parametre"""
+        courses_result: List
+
+        with Dao.connection.cursor() as cursor:
+            sql =   ("SELECT c.id_course FROM course c "
+                    "INNER JOIN takes t ON c.id_course = t.id_course "
+                    "WHERE t.student_nbr = %s")
+            cursor.execute(sql, (student.student_nbr,))
+            courses_result = cursor.fetchall()
+        return courses_result

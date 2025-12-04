@@ -67,7 +67,7 @@ class TeacherDao(Dao[Teacher]):
         courses_result: List
 
         with Dao.connection.cursor() as cursor:
-            sql =   "SELECT name FROM course c WHERE c.id_teacher = %s"
+            sql =   "SELECT id_course FROM course c WHERE c.id_teacher = %s"
             cursor.execute(sql, (teacher.id,))
             courses_result = cursor.fetchall()
         return courses_result

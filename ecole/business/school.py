@@ -83,6 +83,22 @@ class School:
                 if course_oop:
                     student.add_course(course_oop)
 
+        # load courses of teachers
+        courses_by_id = {c.id: c for c in self.courses}
+
+        # for each teachers
+        for teacher in self.teachers:
+            # get his courses
+            his_courses_db = teacher_dao.get_courses(teacher)
+            # for each course
+            for course_db in his_courses_db:
+                # find by id with local courses
+                course_oop = courses_by_id.get(course_db['id_course'])
+                # add if found
+                if course_oop:
+                    teacher.add_course(course_oop)
+
+
     #TEMPORARY
     def parse_by_first_name(self, list, find):
         return next((obj for obj in list if obj.first_name.lower() == find.lower()), None)
@@ -132,15 +148,6 @@ class School:
             self.add_course(course)
         """
 
-        francais = self.getit(self.courses, "français")
-        histoire = self.getit(self.courses, "Histoire")
-        geographie = self.getit(self.courses,"Géographie")
-        mathematiques = self.getit(self.courses,"Mathématiques")
-        physique = self.getit(self.courses,"Physique")
-        chimie = self.getit(self.courses,"Chimie")
-        anglais = self.getit(self.courses,"Anglais")
-        sport = self.getit(self.courses,"sport")
-
         # création des enseignants
         """
         victor  = Teacher('Victor', 'Hugo', 23, date(2023, 9, 4))
@@ -154,14 +161,6 @@ class School:
         for teacher in [victor, jules, sophie, marie, william, michel]:
             self.add_teacher(teacher)
         """
-        victor  = self.parse_by_first_name(self.teachers,'Victor')
-        jules   = self.parse_by_first_name(self.teachers,'Jules')
-        sophie  = self.parse_by_first_name(self.teachers,'Sophie')
-        marie   = self.parse_by_first_name(self.teachers,'Marie')
-        william = self.parse_by_first_name(self.teachers,'William')
-        michel  = self.parse_by_first_name(self.teachers,'Michel')
-
-
         # association des élèves aux cours qu'ils suivent
         """
         for course in [geographie, physique, anglais]:
@@ -174,6 +173,7 @@ class School:
             louis.add_course(course)
         """
         # association des enseignants aux cours qu'ils enseignent
+        """
         victor.add_course(francais)
 
         jules.add_course(histoire)
@@ -187,3 +187,4 @@ class School:
         william.add_course(anglais)
 
         michel.add_course(sport)
+        """

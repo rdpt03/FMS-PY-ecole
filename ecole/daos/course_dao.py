@@ -46,14 +46,16 @@ class CourseDao(Dao[Course]):
 
         #connect and request
         with Dao.connection.cursor() as cursor:
-            sql = "SELECT name, start_date, end_date FROM course;"
+            sql = "SELECT id_course, name, start_date, end_date FROM course;"
             cursor.execute(sql)
             result_courses = cursor.fetchall()
 
         #if results
         if result_courses:
             for course in result_courses:
-                courses.append(Course(course['name'], course['start_date'], course['end_date']))
+                course_oop = Course(course['name'], course['start_date'], course['end_date'])
+                course_oop.id = course['id_course']
+                courses.append(course_oop)
 
         return courses
 
